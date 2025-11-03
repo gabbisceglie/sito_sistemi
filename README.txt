@@ -1,6 +1,6 @@
 Sceglietevi gli argomenti:
 
 La Cpu: Partipillola
-I registri: Bisce
 La Memoria: Boccaciucci
-
+I registri: Bisce
+Architettura del sistema: Mastrangelo
