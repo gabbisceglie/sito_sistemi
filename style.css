@@ -1,3 +1,4 @@
 a {
-    text-decoration: none;
+    text-decoration: none; /* Rimuove la sottolineatura dai link a ogni elemento <a> */
 }
+
