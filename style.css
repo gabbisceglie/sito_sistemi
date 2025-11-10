@@ -2,3 +2,14 @@ a {
     text-decoration: none; /* Rimuove la sottolineatura dai link a ogni elemento <a> */
 }
 
+.button {
+    padding: 5px 10px; /* Spaziatura interna */
+    border: none; /* Nessun bordo */
+    
+}
+
+.img {
+    display: block;
+    margin: 10px 0;
+    border-radius: 10px;
+}
