@@ -1,15 +1,41 @@
+/* Rimuove la sottolineatura dai link a ogni elemento <a> */
 a {
-    text-decoration: none; /* Rimuove la sottolineatura dai link a ogni elemento <a> */
+    text-decoration: none;
 }
 
-.button {
-    padding: 5px 10px; /* Spaziatura interna */
-    border: none; /* Nessun bordo */
-    
+a:visited {
+    color: black; /* Colore dei link visitati */
 }
 
+/* Rimuove i pallini dalle liste */
+.nopalle {
+    list-style-type: none;
+}
+
+/*bordi arrotondati per le immagini */
 .img {
     display: block;
     margin: 10px 0;
     border-radius: 10px;
+}
+
+/* Stili per i bottoni */
+.button {
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    display: inline-block;
+    margin-bottom: 10px;
+}
+
+/* Interazione con il passaggio del mouse sui bottoni*/
+.button:hover {
+    padding: 5px 10px;
+    background-color: #83a8db;
+}
+
+/*quando clicco sul contenuto il testo saltella 2 volte */
+.box {
+    display: inline-block;
+    transition: transform 0.2s;
 }
