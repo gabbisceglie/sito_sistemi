@@ -34,8 +34,18 @@ a:visited {
     background-color: #83a8db;
 }
 
-/*quando clicco sul contenuto il testo saltella 2 volte */
-.box {
-    display: inline-block;
-    transition: transform 0.2s;
+/*typing da finire*/
+.typing {
+    border-right: 2px solid black;
+    white-space: nowrap;
+    overflow: hidden;
 }
+
+@keyframes typing {
+    from { width: 0; }
+    to { width: 100%; }
+}
+@keyframes hide-caret {
+    to { border-right-color: transparent; }
+}
+/* ...existing code... */
