@@ -33,19 +33,3 @@ a:visited {
     padding: 5px 10px;
     background-color: #83a8db;
 }
-
-/*typing da finire*/
-.typing {
-    border-right: 2px solid black;
-    white-space: nowrap;
-    overflow: hidden;
-}
-
-@keyframes typing {
-    from { width: 0; }
-    to { width: 100%; }
-}
-@keyframes hide-caret {
-    to { border-right-color: transparent; }
-}
-/* ...existing code... */
