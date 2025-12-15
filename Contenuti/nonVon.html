@@ -1,0 +1,323 @@
+<html lang="it">
+  <head>
+    <title>Architettura di Von Neumann</title>
+    <link rel="stylesheet" type="text/css" href="../style.css">
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        color: #222;
+        margin: 20px;
+        background-image: url("https://wallpapers.com/images/hd/white-hd-1920-x-1080-background-v6vs7rl1s612r2zd.jpg");
+        background-size: cover;
+        background-attachment: fixed;
+      }
+       .container {
+        background: rgba(255,255,255,0.94);
+        max-width: 940px;
+        margin: 28px auto;
+        padding: 22px;
+        border-radius: 8px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+      }
+      h1 { margin-top:0; color:#111; }
+      h2 { color:#333; margin-bottom:8px; }
+      p, li { line-height:1.6; color:#222; }
+      .diagram { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:12px 0; }
+      .box {
+        background:#f7f7f7;
+        padding:12px;
+        border-radius:6px;
+        border:1px solid #eee;
+        transition: transform 220ms ease, box-shadow 220ms ease;
+        transform-origin: center;
+        position: relative;
+        cursor: pointer;
+      }
+      .box:hover {
+        transform: scale(1.04);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      }
+      .box:focus {
+        outline: 3px solid rgba(100,160,255,0.25);
+        outline-offset: 2px;
+      }
+      .note { font-size:0.95em; color:#444; }
+      a { color:#0645ad; text-decoration:none; }
+      a:hover { text-decoration:underline; }
+      /* finestrina interna, inizialmente nascosta; si "allunga" quando .box ha .expanded
+         -> Modificata per comportamento floating */
+      .popup {
+        position: absolute;
+        left: 0;
+        top: 0;
+        transform-origin: top center;
+        background: #fff;
+        border: 1px solid #eee;
+        padding: 12px;
+        border-radius: 8px;
+        min-width: 220px;
+        box-shadow: 0 12px 36px rgba(0,0,0,0.12);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 180ms ease, transform 180ms ease;
+        z-index: 60;
+      }
+      /* quando espanso rendi visibile (la posizione verrà impostata via JS) */
+      .box.expanded .popup {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateY(0) scale(1);
+      }
+      /* riduci l'animazione iniziale di scala quando nascosto */
+      .popup[aria-hidden="true"] {
+        transform: translateY(-6px) scale(0.99);
+      }
+
+      /* replace details-btn with compact info icon button */
+      .info-btn {
+        display: inline-grid;
+        place-items: center;
+        width: 36px;
+        height: 36px;
+        margin-top: 10px;
+        padding: 0;
+        border-radius: 50%;
+        border: none;
+        background: linear-gradient(90deg,#2b8cff,#0066ff);
+        color: #fff;
+        font-weight: 700;
+        font-size: 16px;
+        line-height: 1;
+        cursor: pointer;
+        box-shadow: 0 6px 18px rgba(38,124,255,0.28), 0 0 12px rgba(38,124,255,0.18);
+        transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms;
+      }
+      .info-btn:hover { transform: translateY(-2px) scale(1.02); filter: brightness(1.03); }
+      .info-btn:focus { outline: 3px solid rgba(38,124,255,0.18); outline-offset: 3px; }
+
+      /* new: styles for per-li info icon and floating popup */
+      .diagram .box ul { padding-left: 18px; margin: 6px 0; }
+      .diagram .box ul li { position: relative; padding-right: 36px; margin: 8px 0; }
+
+      .li-info {
+        position: absolute;
+        right: 6px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: inline-grid;
+        place-items: center;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: linear-gradient(90deg,#6ea8ff,#2b8cff);
+        color: #fff;
+        font-weight: 700;
+        font-size: 13px;
+        line-height: 1;
+        cursor: default;
+        box-shadow: 0 6px 12px rgba(43,140,255,0.12);
+      }
+      .li-info:focus { outline: 2px solid rgba(43,140,255,0.16); outline-offset: 2px; }
+
+      .li-popup {
+        position: absolute;
+        right: 40px;
+        top: 50%;
+        transform: translateY(-6px);
+        background: #fff;
+        border: 1px solid #eee;
+        padding: 8px 10px;
+        border-radius: 6px;
+        min-width: 190px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 160ms ease, transform 160ms ease;
+        font-size: 0.92em;
+        z-index: 30;
+      }
+      /* show on hover or when descendant receives focus */
+      .diagram .box ul li:hover .li-popup,
+      .diagram .box ul li:focus-within .li-popup {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+      }
+
+      @media (max-width:640px){ .diagram { grid-template-columns:1fr; } }
+    </style>
+  </head>
+  <body>
+    
+    <div class="container">
+
+        <h1><center>Architettura Non Von Neumann</center></h1>
+
+        <div class="note">
+            <p><strong>Cosa sono:</strong> Le architetture non Von Neumann rappresentano modelli di progettazione 
+                dei computer che si discostano dall'architettura classica di Von Neumann.</p>
+        </div>
+
+        <div class="diagram" aria-hidden="true">
+            
+        <div class="box">
+          <h3>Architettura di Harvard</h3>
+          <p>L'architettura di Harvard separa fisicamente la memoria per le istruzioni e per i dati, 
+            permettendo accessi simultanei e migliorando le prestazioni.</p>
+
+          <button class="info-btn" aria-expanded="false" aria-controls="popup-1">i</button>
+
+          <div id="popup-1" class="popup" aria-hidden="true">
+            <strong>Harvard - Dettagli</strong>
+            <p>Memoria istruzioni e memoria dati fisicamente separate: permette accessi paralleli riducendo latenza e aumentando banda per istruzioni e dati.</p>
+          </div>
+        </div>
+
+        <div class="box">
+          <h3>Processori Multipli</h3>
+            <ul>
+                <li>
+                  Fuori Ordine
+                  <span class="li-info" tabindex="0" aria-hidden="true">i</span>
+                  <div class="li-popup" role="status" aria-hidden="true">Esecuzione fuori ordine per aumentare parallelismo ed utilizzo delle risorse.</div>
+                </li>
+                <li>
+                  PreFetch
+                  <span class="li-info" tabindex="0" aria-hidden="true">i</span>
+                  <div class="li-popup" role="status" aria-hidden="true">Prefetching dati/istruzioni per ridurre latenze di memoria percepite dalla CPU.</div>
+                </li>
+                <li>
+                  Speculative Inspection
+                  <span class="li-info" tabindex="0" aria-hidden="true">i</span>
+                  <div class="li-popup" role="status" aria-hidden="true">Speculative execution/inspection per predire percorsi e continuare l'esecuzione prima della conferma.</div>
+                </li>
+                <li>
+                  Pipeline
+                  <span class="li-info" tabindex="0" aria-hidden="true">i</span>
+                  <div class="li-popup" role="status" aria-hidden="true">Pipeline per suddividere istruzioni in stadi e aumentare throughput complessivo.</div>
+                </li>
+            </ul>
+
+        </div>
+      </div>
+            <h2>Come funziona l'architettura di Harvard</h2>
+      <p>Harvard separa fisicamente memoria/linee per istruzioni e dati, migliorando la banda e la latenza per alcuni carichi ma riducendo la semplicità di gestione del codice come dato.</p>
+
+        <h2>Vantaggi e svantaggi</h2>
+        <ul>
+            <li><strong>Vantaggi:</strong>Maggiore velocità di accesso, riduzione del collo di bottiglia, migliore efficienza energetica.</li>
+            <li><strong>Svantaggi:</strong>Maggiore complessità di progettazione, costi più elevati, difficoltà nella gestione del codice come dato.</li>
+        </ul>
+    </div>
+
+    <!-- script per toggle SOLO al click dell'info button e supporto accessibilità -->
+    <script>
+      // per le "I" dentro i li: mostrare la popup al hover e anche al focus (accessibilità)
+      document.querySelectorAll('.li-info').forEach(icon => {
+        const li = icon.closest('li');
+        const popup = li.querySelector('.li-popup');
+        const show = () => { popup && popup.setAttribute('aria-hidden', 'false'); };
+        const hide = () => { popup && popup.setAttribute('aria-hidden', 'true'); };
+        li.addEventListener('mouseenter', show);
+        li.addEventListener('mouseleave', hide);
+        icon.addEventListener('focus', show);
+        icon.addEventListener('blur', hide);
+      });
+
+      // Floating popup per il pulsante info nel box di sinistra (id popup-1)
+      document.querySelectorAll('.info-btn').forEach(btn => {
+        const popupId = btn.getAttribute('aria-controls');
+        const popup = document.getElementById(popupId);
+        const box = btn.closest('.box');
+
+        const setState = (open) => {
+          if (open) {
+            box.classList.add('expanded');
+            btn.setAttribute('aria-expanded', 'true');
+            if (popup) popup.setAttribute('aria-hidden', 'false');
+            // posiziona il popup dopo che è reso visibile (misurazione affidabile)
+            requestAnimationFrame(() => positionFloatingPopup(btn, box, popup));
+          } else {
+            box.classList.remove('expanded');
+            btn.setAttribute('aria-expanded', 'false');
+            if (popup) popup.setAttribute('aria-hidden', 'true');
+            // rimuovi eventuali coordinate inline quando chiuso (opzionale)
+            if (popup) {
+              popup.style.left = '';
+              popup.style.top = '';
+            }
+          }
+        };
+
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          setState(!box.classList.contains('expanded'));
+        });
+        btn.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setState(!box.classList.contains('expanded'));
+          } else if (e.key === 'Escape') {
+            setState(false);
+            btn.focus();
+          }
+        });
+      });
+
+      function positionFloatingPopup(btn, box, popup) {
+        if (!popup || !btn || !box) return;
+        // Solo posizionamento specifico per il popup-1 (box sinistro) se presente
+        if (popup.id !== 'popup-1') return;
+
+        // misura bounding rect
+        const btnRect = btn.getBoundingClientRect();
+        const boxRect = box.getBoundingClientRect();
+
+        // assicurati che il popup sia visibile per la misurazione
+        popup.style.left = '0px';
+        popup.style.top = '0px';
+
+        const popupRect = popup.getBoundingClientRect();
+
+        // calcola posizione preferita: sotto il bottone, centrato orizzontalmente rispetto al bottone
+        let left = (btnRect.left - boxRect.left) + (btnRect.width / 2) - (popupRect.width / 2);
+        let top = (btnRect.bottom - boxRect.top) + 10; // 10px di gap sotto il bottone
+
+        // converti in coordinate assolute per il controllo con i bordi della viewport
+        const absLeft = boxRect.left + left;
+        const absTop = boxRect.top + top;
+
+        // margine minimo dal bordo della finestra
+        const margin = 8;
+        // correggi overflow a destra
+        if (absLeft + popupRect.width > window.innerWidth - margin) {
+          left -= (absLeft + popupRect.width) - (window.innerWidth - margin);
+        }
+        // correggi overflow a sinistra
+        if (absLeft < margin) {
+          left += (margin - absLeft);
+        }
+        // se il popup uscirebbe dal basso dello schermo, posizionalo sopra il pulsante
+        if (absTop + popupRect.height > window.innerHeight - margin) {
+          top = (btnRect.top - boxRect.top) - popupRect.height - 10; // sopra con gap 10
+        }
+
+        // applica coordinate relative al box (box ha position:relative)
+        popup.style.left = Math.max(0, Math.round(left)) + 'px';
+        popup.style.top  = Math.round(top) + 'px';
+      }
+
+      // opzionale: ricalcola posizione su resize per popup aperto
+      window.addEventListener('resize', () => {
+        const openBtn = document.querySelector('.info-btn[aria-expanded="true"]');
+        if (openBtn) {
+          const popup = document.getElementById(openBtn.getAttribute('aria-controls'));
+          positionFloatingPopup(openBtn, openBtn.closest('.box'), popup);
+        }
+      });
+
+      // Nota: nessun listener globale per chiudere i popup con click esterno (comportamento preservato)
+    </script>
+
+  </body>
+</html>
