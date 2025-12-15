@@ -1,0 +1,84 @@
+<html lang="it">
+  <head>
+    <title>Architettura di Von Neumann</title>
+    <link rel="stylesheet" type="text/css" href="../style.css">
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        color: #222;
+        margin: 20px;
+        background-image: url("https://wallpapers.com/images/hd/white-hd-1920-x-1080-background-v6vs7rl1s612r2zd.jpg");
+        background-size: cover;
+        background-attachment: fixed;
+      }
+      .container {
+        background: rgba(255,255,255,0.94);
+        max-width: 940px;
+        margin: 28px auto;
+        padding: 22px;
+        border-radius: 8px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+      }
+      h1 { margin-top:0; color:#111; }
+      h2 { color:#333; margin-bottom:8px; }
+      p, li { line-height:1.6; color:#222; }
+      .diagram { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:12px 0; }
+      .box {
+        background:#f7f7f7;
+        padding:12px;
+        border-radius:6px;
+        border:1px solid #eee;
+      }
+      .note { font-size:0.95em; color:#444; }
+      a { color:#0645ad; text-decoration:none; }
+      a:hover { text-decoration:underline; }
+      @media (max-width:640px){ .diagram { grid-template-columns:1fr; } }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Architettura di Von Neumann</h1>
+
+      <p class="note"><strong>Definizione:</strong> modello di calcolatore in cui istruzioni e dati condividono la stessa memoria; la CPU opera ripetendo il ciclo fetch → decode → execute.</p>
+
+      <h2>Componenti principali</h2>
+      <div class="diagram" aria-hidden="true">
+        <div class="box">
+          <h3>Memoria</h3>
+          <p>Contiene sia le istruzioni sia i dati. L'accesso avviene tramite indirizzi; ogni cella può contenere codice o dato.</p>
+        </div>
+        <div class="box">
+          <h3>CPU</h3>
+          <p>Unità di Controllo: fetch e decode delle istruzioni; ALU: esecuzione di operazioni aritmetiche/logiche; registri e Program Counter (PC) per tenere lo stato.</p>
+        </div>
+      </div>
+
+      <h2>Ciclo base: fetch → decode → execute</h2>
+      <p>1) Fetch: il PC fornisce l'indirizzo, l'istruzione viene letta dalla memoria. 2) Decode: il decoder interpreta opcode e operandi. 3) Execute: l'ALU o le unità di controllo eseguono l'istruzione; eventualmente si scrive il risultato in registri o memoria.</p>
+
+      <h2>Organizzazione delle istruzioni</h2>
+      <ul>
+        <li>Formato tipico: opcode + operandi/indirizzi.</li>
+        <li>Decoder traduce opcode in segnali di controllo che guidano ALU, registri e bus.</li>
+        <li>Il codice è trattato come dato: possibilità di auto‑modifica.</li>
+      </ul>
+
+      <h2>Von Neumann bottleneck</h2>
+      <p class="note">La condivisione di un unico canale (bus) per istruzioni e dati limita la banda effettiva tra CPU e memoria: questo è il principale collo di bottiglia del modello.</p>
+      <ul>
+        <li>Mitigazioni moderne: gerarchie di cache (L1/L2/L3), pipeline, prefetch, bus separati o architetture ibride (es. Harvard).</li>
+      </ul>
+
+      <h2>Confronto rapido con Harvard</h2>
+      <p>Harvard separa fisicamente memoria/linee per istruzioni e dati, migliorando la banda e la latenza per alcuni carichi ma riducendo la semplicità di gestione del codice come dato.</p>
+
+      <h2>Esempio sintetico</h2>
+      <p>PC -> fetch istruzione "ADD R1, R2". Decoder identifica ADD, indirizzi registri. ALU esegue R1 + R2 → risultato salvato secondo l'istruzione.</p>
+
+      <h2>Perché è rilevante</h2>
+      <p>Il modello rimane la base concettuale dei computer moderni; le ottimizzazioni hardware e microarchitetturali ne conservano i principi fondamentali superando i limiti pratici.</p>
+
+      <p class="note">Torna alla pagina principale: <a href="../architettura.html">John von Neumann</a></p>
+    </div>
+  </body>
+</html>
