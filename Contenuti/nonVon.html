@@ -229,6 +229,7 @@
         const popupId = btn.getAttribute('aria-controls');
         const popup = document.getElementById(popupId);
         const box = btn.closest('.box');
+        let isLocked = false; // stato bloccato (rimane aperto dopo click)
 
         const setState = (open) => {
           if (open) {
@@ -249,15 +250,42 @@
           }
         };
 
+        // Mostra al hover (a meno che non sia bloccato)
+        btn.addEventListener('mouseenter', () => {
+          if (!isLocked) {
+            setState(true);
+          }
+        });
+
+        // Nascondi al mouseleave (a meno che non sia bloccato)
+        btn.addEventListener('mouseleave', () => {
+          if (!isLocked) {
+            setState(false);
+          }
+        });
+
+        // Click: blocca/sblocca il popup
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
-          setState(!box.classList.contains('expanded'));
+          isLocked = !isLocked;
+          if (isLocked) {
+            setState(true);
+          } else {
+            setState(false);
+          }
         });
+
         btn.addEventListener('keydown', (e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
-            setState(!box.classList.contains('expanded'));
+            isLocked = !isLocked;
+            if (isLocked) {
+              setState(true);
+            } else {
+              setState(false);
+            }
           } else if (e.key === 'Escape') {
+            isLocked = false;
             setState(false);
             btn.focus();
           }
